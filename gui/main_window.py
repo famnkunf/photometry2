@@ -1,5 +1,5 @@
 from astropy.io import fits
-from PyQt5.QtWidgets import QFileDialog, QHBoxLayout, QPushButton, QWidget
+from PyQt5.QtWidgets import QFileDialog, QHBoxLayout, QPushButton, QWidget, QVBoxLayout
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -9,11 +9,19 @@ class MainWindow(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setLayout(QHBoxLayout())
+        main_layout = QVBoxLayout()
+        self.setLayout(main_layout)
+
+        self.hbox = QHBoxLayout()
+        main_layout.addLayout(self.hbox)
+        main_layout.addStretch(1)
+
         self.open_fits_file_button = QPushButton("Open FITS File", self)
         self.open_fits_file_button.setToolTip("Click to open a FITS file")
         self.open_fits_file_button.clicked.connect(self.open_fits_file)
-        self.layout().addWidget(self.open_fits_file_button)
+        self.hbox.addWidget(self.open_fits_file_button)
+        self.hbox.addStretch(1)
+        
 
     def open_fits_file(self):
         options = QFileDialog.Options()
