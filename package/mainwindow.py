@@ -5,6 +5,7 @@ import numpy as np
 from .ui import mainwindow_ui
 from .widgets.displaywindow import DisplayWindow
 from .widgets.histogramwindow import HistogramWindow
+from .widgets.aperturewindow import ApertureWindow
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -16,6 +17,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.action_Open.triggered.connect(self.action_Open)
         self.ui.actionSave_All.triggered.connect(self.action_SaveAll)
         self.ui.actionHistogram.triggered.connect(self.action_Histogram)
+        self.ui.actionAperture.triggered.connect(self.action_Aperture)
         self.display_windows: list[DisplayWindow] = []
         self.limit = ()
         self.current_display_window = None
@@ -41,8 +43,15 @@ class MainWindow(QtWidgets.QMainWindow):
                     print(f"Error opening FITS file: {e}")
                     
     def action_Histogram(self):
-        self.histogram_window = HistogramWindow(self)
-        self.histogram_window.show()
+        if self.histogram_window is None:
+            self.histogram_window = HistogramWindow(self)
+            self.histogram_window.show()
+        else:
+            self.histogram_window.raise_()
+
+    def action_Aperture(self):
+        if self.aperture_window is None:
+            pass
                 
     def closeEvent(self, event):
         question_box = QtWidgets.QMessageBox(self)
