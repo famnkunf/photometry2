@@ -1,8 +1,4 @@
-from gui.main_window import MainWindow
-from PyQt5.QtWidgets import QApplication
+from package import app
 
 if __name__ == "__main__":
-    app = QApplication([])
-    window = MainWindow()
-    window.show()
-    app.exec_()
+    app.loop()
