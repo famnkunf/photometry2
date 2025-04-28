@@ -51,7 +51,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def action_Aperture(self):
         if self.aperture_window is None:
-            pass
+            self.aperture_window = ApertureWindow(self)
+            self.aperture_window.show()
+        else:
+            self.aperture_window.raise_()
                 
     def closeEvent(self, event):
         question_box = QtWidgets.QMessageBox(self)
