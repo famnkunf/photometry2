@@ -8,7 +8,7 @@ from astropy.visualization import ImageNormalize, LinearStretch
 from ..ui import displaywindow_ui
 from .headerwindow import HeaderWindow
 
-mpl.use('Qt5Agg')
+mpl.use('QtAgg')
 class DisplayWindow(QtWidgets.QWidget):
     def __init__(self, image, title, header_data=None, main_window=None):
         super().__init__()
@@ -22,6 +22,7 @@ class DisplayWindow(QtWidgets.QWidget):
         self.figure, self.ax = plt.subplots()
         self.ax.axis('off')
         self.canvas = FigureCanvas(self.figure)
+        self.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
         self.toolbar = NavigationToolbar(self.canvas, self)
         self.toolbar.hide()
         self.norm = ImageNormalize(self.image, stretch=LinearStretch())
@@ -34,6 +35,11 @@ class DisplayWindow(QtWidgets.QWidget):
         self.plot_image()
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.main_window = main_window
+        
+    def on_mouse_move(self, event):
+        if self.main_window.aperture_window:
+            if self.toolbar.mode != 'pan/zoom':
+                self.main_window.aperture_window.draw_aperture(self, event)
         
     def pan_and_zoom(self):
         self.toolbar.pan()
