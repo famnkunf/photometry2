@@ -77,6 +77,6 @@ class HistogramWindow(QtWidgets.QWidget):
         self.update_markers()
         self.canvas.draw_idle()
         
-    def close(self):
+    def closeEvent(self, event):
         self.main_window.histogram_window = None
-        super().close()
+        super().closeEvent()

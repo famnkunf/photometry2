@@ -76,4 +76,6 @@ class DisplayWindow(QtWidgets.QWidget):
             warning.exec_()
         self.ui.OpenHeader.setEnabled(False)
         
+    def closeEvent(self, event):
+        return super().closeEvent(event)
         
