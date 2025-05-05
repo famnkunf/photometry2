@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 import numpy as np
 from vispy import scene
+from photutils.centroids import centroid_2dg
 
 from ..ui import aperturewindow_ui
 
@@ -22,23 +23,52 @@ class ApertureWindow(QtWidgets.QWidget):
         self.inner_aperture.transform = transform
         self.gap_aperture.transform = transform
         self.outer_aperture.transform = transform
+        self.current_display_window = None
+        self.current_x = None
+        self.current_y = None
+        self.objects = []
+        self.drawing = True
         
     def update_value(self):
-        pass
-        
+        self.draw_aperture(self.current_display_window, self.current_x, self.current_y)
+            
     def draw_aperture(self, display_window, x, y):
-        if x is not None and y is not None:
-            self.inner_aperture.center = (x, y)
-            self.gap_aperture.center = (x, y)
-            self.outer_aperture.center = (x, y)
-            self.inner_aperture.radius = (self.ui.major_axis.value(), self.ui.minor_axis.value())
-            self.gap_aperture.radius = (self.ui.major_axis.value() + 2*self.ui.gap.value(), self.ui.minor_axis.value() + 2*self.ui.gap.value())
-            self.outer_aperture.radius = (self.ui.major_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value(), self.ui.minor_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value())
-            if self.inner_aperture.parent != display_window.view.scene:
-                display_window.view.add(self.inner_aperture)
-                display_window.view.add(self.gap_aperture)
-                display_window.view.add(self.outer_aperture)
-                
+        if self.drawing:
+            if x is not None and y is not None:
+                self.current_x, self.current_y = x, y
+                self.inner_aperture.center = (x, y)
+                self.gap_aperture.center = (x, y)
+                self.outer_aperture.center = (x, y)
+                self.inner_aperture.radius = (self.ui.major_axis.value(), self.ui.minor_axis.value())
+                self.gap_aperture.radius = (self.ui.major_axis.value() + 2*self.ui.gap.value(), self.ui.minor_axis.value() + 2*self.ui.gap.value())
+                self.outer_aperture.radius = (self.ui.major_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value(), self.ui.minor_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value())
+                if self.inner_aperture.parent != display_window.view.scene:
+                    self.current_display_window = display_window
+                    display_window.view.add(self.inner_aperture)
+                    display_window.view.add(self.gap_aperture)
+                    display_window.view.add(self.outer_aperture)
+                    
+    def toggle_drawing(self, display_window, x, y):
+        self.drawing = not self.drawing
+        centroid_x, centroid_y = self.get_centroid(display_window, x, y)
+        self.inner_aperture.center = (centroid_x, centroid_y)
+        self.gap_aperture.center = (centroid_x, centroid_y)
+        self.outer_aperture.center = (centroid_x, centroid_y)
+        
+        
+    def get_centroid(self, display_window, x, y):
+        a = self.ui.major_axis.value()
+        b = self.ui.minor_axis.value()
+        angle = np.deg2rad(self.ui.angle.value())
+        if a >= b:
+            temp = a
+        else:
+            temp = b
+        inner_pixels = display_window.image[int(y - temp):int(y + temp), int(x - temp):int(x + temp)]
+        centroid_x, centroid_y = centroid_2dg(inner_pixels)
+        if centroid_x < 0 or centroid_x >= inner_pixels.shape[1] or centroid_y < 0 or centroid_y >= inner_pixels.shape[0]:
+            return x, y
+        return (centroid_x + x - temp, centroid_y + y - temp)                
     def close(self):
         self.main_window.aperture_window = None
         super().close()

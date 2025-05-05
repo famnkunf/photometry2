@@ -30,6 +30,7 @@ class DisplayWindow(QtWidgets.QWidget):
         self.ui.OpenHeader.clicked.connect(self.open_header)
         self.canvas.events.mouse_move.connect(self.on_mouse_move)
         self.canvas.events.mouse_wheel.connect(self.on_zoom)
+        self.canvas.events.mouse_press.connect(self.on_mouse_clicked)
         self.plot_image()
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.main_window = main_window
@@ -41,6 +42,15 @@ class DisplayWindow(QtWidgets.QWidget):
 
     def on_zoom(self, event):
         pass
+    
+    def on_mouse_clicked(self, event):
+        if self.main_window.aperture_window:
+            if event.is_dragging:
+                pass
+            else:
+                transform = self.image_scene.get_transform(map_to='canvas')
+                x, y, _, _= transform.imap(event.pos)
+                self.main_window.aperture_window.toggle_drawing(self, x, y)
             
     def on_mouse_move(self, event):
         transform = self.image_scene.get_transform(map_to='canvas')
