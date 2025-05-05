@@ -4,6 +4,8 @@ from matplotlib.backends.backend_qt5 import NavigationToolbar2QT as NavigationTo
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 from astropy.visualization import ImageNormalize, LinearStretch
+from vispy import app, scene
+import numpy as np
 
 from ..ui import displaywindow_ui
 from .headerwindow import HeaderWindow
@@ -19,40 +21,38 @@ class DisplayWindow(QtWidgets.QWidget):
         self.header_data = header_data
         self.setWindowTitle(self.title)
         self.setGeometry(0, 0, 800, 600)
-        self.figure, self.ax = plt.subplots()
-        self.ax.axis('off')
-        self.canvas = FigureCanvas(self.figure)
-        self.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
-        self.toolbar = NavigationToolbar(self.canvas, self)
-        self.toolbar.hide()
-        self.norm = ImageNormalize(self.image, stretch=LinearStretch())
-        self.norm.vmin = self.image.mean() - 0 * self.image.std()
-        self.norm.vmax = self.image.mean() + 0.5 * self.image.std()
-        self.ui.verticalLayout_2.addWidget(self.canvas)
+        self.canvas = scene.SceneCanvas(keys='interactive')
+        self.view = self.canvas.central_widget.add_view(bgcolor='gray')
+        self.image_scene = scene.Image(self.image,cmap='gray', parent=self.view.scene)
+        self.view.camera = scene.PanZoomCamera(rect=(0, 0, self.image.shape[1], self.image.shape[0]), aspect=1)
+        self.image_scene.clim = (self.image.mean() - 0. * self.image.std(), self.image.mean() + 0.5 * self.image.std())
+        self.ui.verticalLayout_2.addWidget(self.canvas.native)
         self.ui.OpenHeader.clicked.connect(self.open_header)
-        self.ui.pan_and_zoom.clicked.connect(self.pan_and_zoom)
-        self.ui.home.clicked.connect(self.toolbar.home)
+        self.canvas.events.mouse_move.connect(self.on_mouse_move)
+        self.canvas.events.mouse_wheel.connect(self.on_zoom)
         self.plot_image()
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.main_window = main_window
-        
-    def on_mouse_move(self, event):
-        if self.main_window.aperture_window:
-            if self.toolbar.mode != 'pan/zoom':
-                self.main_window.aperture_window.draw_aperture(self, event)
-        
-    def pan_and_zoom(self):
-        self.toolbar.pan()
         
     def focusInEvent(self, event: QtGui.QFocusEvent):
         if self.main_window.histogram_window:
             self.main_window.histogram_window.set_data(self)
         return super().focusInEvent(event)
+
+    def on_zoom(self, event):
+        pass
+            
+    def on_mouse_move(self, event):
+        transform = self.image_scene.get_transform(map_to='canvas')
+        if event.pos is not None:
+            x, y, _, _= transform.imap(event.pos)
+            if self.main_window.aperture_window:
+                self.main_window.aperture_window.draw_aperture(self, x, y)
+            self.canvas.update()
     
     def plot_image(self):
-        self.ax.imshow(self.image, cmap='gray', norm=self.norm, interpolation='bicubic', interpolation_stage='data')
-        self.canvas.draw()
-        
+        pass
+            
     def open_header(self):
         if self.header_data is not None:
             self.header_window = HeaderWindow(self.header_data, self.title + " - Header")

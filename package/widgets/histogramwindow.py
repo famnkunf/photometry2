@@ -40,9 +40,7 @@ class HistogramWindow(QtWidgets.QWidget):
         if self.display_window:
             self.ui.horizontalSlider.setValue(int(self.ui.doubleSpinBox_2.value()*100))
             self.ui.horizontalSlider_2.setValue(int(self.ui.doubleSpinBox.value()*100))
-            self.display_window.norm.vmin = self.ui.doubleSpinBox_2.value()
-            self.display_window.norm.vmax = self.ui.doubleSpinBox.value()
-            self.display_window.canvas.draw_idle()
+            self.display_window.image_scene.clim = (self.ui.doubleSpinBox_2.value(), self.ui.doubleSpinBox.value())
         
     def on_slider_value_changed(self):
         self.ui.doubleSpinBox_2.setValue(self.ui.horizontalSlider.value()/100)
@@ -51,9 +49,7 @@ class HistogramWindow(QtWidgets.QWidget):
         
     def on_slider_release(self):
         if self.display_window:
-            self.display_window.norm.vmin = self.ui.horizontalSlider.value()/100
-            self.display_window.norm.vmax = self.ui.horizontalSlider_2.value()/100
-            self.display_window.canvas.draw_idle()
+            self.display_window.image_scene.clim = (self.ui.horizontalSlider.value()/100, self.ui.horizontalSlider_2.value()/100)
         
     def update_markers(self):
         if self.scatter_plots is not None:
@@ -68,10 +64,10 @@ class HistogramWindow(QtWidgets.QWidget):
         max_val = self.histogram_data.mean() + 4 * self.histogram_data.std()
         self.ui.horizontalSlider.setRange(int(min_val*100), int(max_val*100))
         self.ui.horizontalSlider_2.setRange(int(min_val*100), int(max_val*100))
-        self.ui.horizontalSlider.setValue(int(self.display_window.norm.vmin*100))
-        self.ui.doubleSpinBox_2.setValue(self.display_window.norm.vmin)
-        self.ui.horizontalSlider_2.setValue(int(self.display_window.norm.vmax*100))
-        self.ui.doubleSpinBox.setValue(self.display_window.norm.vmax)
+        self.ui.horizontalSlider.setValue(int(self.display_window.image_scene.clim[0]*100))
+        self.ui.doubleSpinBox_2.setValue(self.display_window.image_scene.clim[0])
+        self.ui.horizontalSlider_2.setValue(int(self.display_window.image_scene.clim[1]*100))
+        self.ui.doubleSpinBox.setValue(self.display_window.image_scene.clim[1])
         self.scatter_plots = None
         self.ax.clear()
         self.hist = self.ax.hist(self.histogram_data, bins=self.bin, range=(min_val, max_val), color='blue', alpha=0.7)
