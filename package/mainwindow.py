@@ -6,6 +6,7 @@ from .ui import mainwindow_ui
 from .widgets.displaywindow import DisplayWindow
 from .widgets.histogramwindow import HistogramWindow
 from .widgets.aperturewindow import ApertureWindow
+from .widgets.objectswindow import ObjectsWindow
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -18,11 +19,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSave_All.triggered.connect(self.action_SaveAll)
         self.ui.actionHistogram.triggered.connect(self.action_Histogram)
         self.ui.actionAperture.triggered.connect(self.action_Aperture)
+        self.ui.actionObjects.triggered.connect(self.action_Objects)
         self.display_windows: list[DisplayWindow] = []
         self.limit = ()
         self.current_display_window = None
         self.histogram_window = None
         self.aperture_window = None
+        self.objects_window = None
     def action_SaveAll(self):
         print("Save All")
         
@@ -41,6 +44,13 @@ class MainWindow(QtWidgets.QMainWindow):
                             print("No image data found in the FITS file.")
                 except Exception as e:
                     print(f"Error opening FITS file: {e}")
+                    
+    def action_Objects(self):
+        if self.objects_window is None:
+            self.objects_window = ObjectsWindow(self)
+            self.objects_window.show()
+        else:
+            self.objects_window.raise_()
                     
     def action_Histogram(self):
         if self.histogram_window is None:
@@ -72,6 +82,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 display_window.close()
             if self.aperture_window:
                 self.aperture_window.close()
+            if self.objects_window:
+                self.objects_window.close()
             super().closeEvent(event)
         else:
             event.ignore()

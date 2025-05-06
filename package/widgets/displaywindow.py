@@ -29,6 +29,7 @@ class DisplayWindow(QtWidgets.QWidget):
         self.canvas.events.mouse_wheel.connect(self.on_zoom)
         self.canvas.events.mouse_press.connect(self.on_mouse_click)
         self.canvas.events.mouse_double_click.connect(self.on_mouse_double_click)
+        self.ui.home.clicked.connect(self.view.camera.reset)
         self.plot_image()
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.main_window = main_window
@@ -42,7 +43,11 @@ class DisplayWindow(QtWidgets.QWidget):
         pass
     
     def on_mouse_double_click(self, event):
-        pass
+        if self.main_window.aperture_window:
+            transform = self.image_scene.get_transform(map_to='canvas')
+            x, y, _, _= transform.imap(event.pos)
+            self.main_window.aperture_window.add_new_object(self, x, y)
+            self.main_window.aperture_window.aperture.visible = False
     
     def on_mouse_click(self, event):
         if self.main_window.aperture_window:

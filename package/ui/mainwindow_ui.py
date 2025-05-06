@@ -39,10 +39,13 @@ class Ui_MainWindow(object):
         self.actionSave_All.setObjectName("actionSave_All")
         self.actionAperture = QtWidgets.QAction(MainWindow)
         self.actionAperture.setObjectName("actionAperture")
+        self.actionObjects = QtWidgets.QAction(MainWindow)
+        self.actionObjects.setObjectName("actionObjects")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addAction(self.actionSave_All)
         self.menuWindow.addAction(self.actionHistogram)
         self.menuWindow.addAction(self.actionAperture)
+        self.menuWindow.addAction(self.actionObjects)
         self.menubar.addAction(self.menu_File.menuAction())
         self.menubar.addAction(self.menuWindow.menuAction())
 
@@ -59,3 +62,4 @@ class Ui_MainWindow(object):
         self.actionHistogram.setText(_translate("MainWindow", "Histogram"))
         self.actionSave_All.setText(_translate("MainWindow", "Save All"))
         self.actionAperture.setText(_translate("MainWindow", "Aperture"))
+        self.actionObjects.setText(_translate("MainWindow", "Objects"))

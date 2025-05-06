@@ -27,13 +27,6 @@ class Ui_DisplayWindow(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.pan_and_zoom = QtWidgets.QPushButton(self.widget)
-        self.pan_and_zoom.setCheckable(False)
-        self.pan_and_zoom.setAutoDefault(False)
-        self.pan_and_zoom.setDefault(False)
-        self.pan_and_zoom.setFlat(False)
-        self.pan_and_zoom.setObjectName("pan_and_zoom")
-        self.horizontalLayout_2.addWidget(self.pan_and_zoom)
         self.home = QtWidgets.QPushButton(self.widget)
         self.home.setObjectName("home")
         self.horizontalLayout_2.addWidget(self.home)
@@ -67,7 +60,6 @@ class Ui_DisplayWindow(object):
     def retranslateUi(self, DisplayWindow):
         _translate = QtCore.QCoreApplication.translate
         DisplayWindow.setWindowTitle(_translate("DisplayWindow", "Form"))
-        self.pan_and_zoom.setText(_translate("DisplayWindow", "Pan and Zoom"))
         self.home.setText(_translate("DisplayWindow", "Home"))
         self.OpenHeader.setText(_translate("DisplayWindow", "Open Header"))
         self.pushButton.setText(_translate("DisplayWindow", "Save"))
