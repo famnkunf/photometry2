@@ -19,7 +19,7 @@ class ObjectsWindow(QtWidgets.QWidget):
         self.ui.objects_table.cellChanged.connect(self.update_object)
         self.ui.objects_table.itemSelectionChanged.connect(self.update_selected_object)
         
-    def add_new_object(self, display_window, x, y, major_axis, minor_axis, angle, gap, background, intensity):
+    def add_new_object(self, display_window, x, y, major_axis, minor_axis, angle, gap, background, intensity, snr):
         aperture = scene.Node(parent=display_window.view.scene)
         inner_aperture = scene.Ellipse(center=(x, y), radius=(major_axis, minor_axis), border_color='yellow', color=(0, 0, 0, 0), parent=aperture)
         gap_aperture = scene.Ellipse(center=(x, y), radius=(major_axis + 2*gap, minor_axis + 2*gap), border_color='yellow', color=(0, 0, 0, 0), parent=aperture)
@@ -33,9 +33,10 @@ class ObjectsWindow(QtWidgets.QWidget):
         aperture.transform = transform
         new_object = {
             'id': len(self.objects),
-            'x': x,
-            'y': y,
-            'intensity': intensity,
+            'x': round(x, 2),
+            'y': round(y, 2),
+            'intensity': round(intensity, 2),
+            'snr': round(snr, 2),
             'name': '',
             'notes': '',
             'major_axis': major_axis,
@@ -92,8 +93,10 @@ class ObjectsWindow(QtWidgets.QWidget):
         elif column == 3:
             self.objects[row]['intensity'] = float(self.ui.objects_table.item(row, column).text())
         elif column == 4:
-            self.objects[row]['name'] = self.ui.objects_table.item(row, column).text()
+            self.objects[row]['snr'] = float(self.ui.objects_table.item(row, column).text())
         elif column == 5:
+            self.objects[row]['name'] = self.ui.objects_table.item(row, column).text()
+        elif column == 6:
             self.objects[row]['notes'] = self.ui.objects_table.item(row, column).text()
     
     def update_table(self):
@@ -107,7 +110,7 @@ class ObjectsWindow(QtWidgets.QWidget):
             for j, k in enumerate(obj.keys()):
                 item = QtWidgets.QTableWidgetItem(str(obj[k]))
                 self.ui.objects_table.setItem(i, j, item)
-        for i in range(6, 14):
+        for i in range(7, 15):
             self.ui.objects_table.hideColumn(i)
         self.ui.objects_table.resizeColumnsToContents()
         self.ui.objects_table.resizeRowsToContents()
@@ -118,9 +121,9 @@ class ObjectsWindow(QtWidgets.QWidget):
         file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save Objects", "", "CSV files (*.csv);;All files (*)")
         if file_name:
             with open(file_name, 'w') as f:
-                f.write("ID,X,Y,Intensity,Name,Notes\n")
+                f.write("ID,X,Y,Intensity,SNR,Name,Notes\n")
                 for obj in self.objects:
-                    f.write(f"{obj['id']},{obj['x']},{obj['y']},{obj['intensity']},{obj['name']},{obj['notes']+'-'+obj['file_name']}\n")
+                    f.write(f"{obj['id']},{obj['x']},{obj['y']},{obj['intensity']},{obj['snr']},{obj['name']},{obj['notes']+'-'+obj['file_name']}\n")
         
     def closeEvent(self, a0):
         return super().closeEvent(a0)

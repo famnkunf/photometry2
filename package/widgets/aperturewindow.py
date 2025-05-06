@@ -106,7 +106,7 @@ class ApertureWindow(QtWidgets.QWidget):
         angle = np.deg2rad(self.ui.angle.value())
         gap = self.ui.gap.value()
         background = self.ui.background.value()
-        intensity = self.get_intensity(display_window, centroid_x, centroid_y, major_axis, minor_axis, angle, gap, background)
+        intensity, snr = self.get_intensity(display_window, centroid_x, centroid_y, major_axis, minor_axis, angle, gap, background)
         if self.main_window.objects_window:
             self.main_window.objects_window.add_new_object(
                 display_window,
@@ -117,7 +117,8 @@ class ApertureWindow(QtWidgets.QWidget):
                 angle,
                 gap,
                 background,
-                intensity)
+                intensity,
+                snr)
             self.main_window.objects_window.raise_()
         else:
             self.main_window.objects_window = ObjectsWindow(self.main_window)
@@ -130,7 +131,8 @@ class ApertureWindow(QtWidgets.QWidget):
                 angle,
                 gap,
                 background,
-                intensity)
+                intensity, 
+                snr)
             self.main_window.objects_window.show()
 
     def get_intensity(self, displaywindow, x, y, major_axis, minor_axis, angle, gap, background):
@@ -160,7 +162,8 @@ class ApertureWindow(QtWidgets.QWidget):
         inner_pixels = displaywindow.image[inner_mask]
         background_pixels = displaywindow.image[background_mask & ~gap_mask]
         intensity = np.sum(inner_pixels - np.mean(background_pixels))
-        return intensity
+        snr = intensity / (np.std(background_pixels)*np.sqrt(len(inner_pixels)))
+        return intensity, snr
                                
     def closeEvent(self, event):
         self.main_window.aperture_window = None
