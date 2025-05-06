@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 import numpy as np
-from vispy import scene
+from vispy import scene, util
 from photutils.centroids import centroid_2dg
 
 from ..ui import aperturewindow_ui
@@ -41,6 +41,11 @@ class ApertureWindow(QtWidgets.QWidget):
                 self.inner_aperture.radius = (self.ui.major_axis.value(), self.ui.minor_axis.value())
                 self.gap_aperture.radius = (self.ui.major_axis.value() + 2*self.ui.gap.value(), self.ui.minor_axis.value() + 2*self.ui.gap.value())
                 self.outer_aperture.radius = (self.ui.major_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value(), self.ui.minor_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value())
+                transform = scene.MatrixTransform()
+                transform.translate((-x, -y, -1))
+                transform.rotate(self.ui.angle.value(), (0, 0, 1))
+                transform.translate((x, y, 0))
+                self.aperture.transform = transform
                 if self.inner_aperture.parent != display_window.view.scene:
                     self.current_display_window = display_window
                     display_window.view.add(self.aperture)
@@ -55,15 +60,28 @@ class ApertureWindow(QtWidgets.QWidget):
         
         
     def get_centroid(self, display_window, x, y):
-        a = self.ui.major_axis.value()
-        b = self.ui.minor_axis.value()
+        major_axis = self.ui.major_axis.value()
+        minor_axis = self.ui.minor_axis.value()
         angle = np.deg2rad(self.ui.angle.value())
-        if a >= b:
-            temp = a
+        if major_axis >= minor_axis:
+            temp = major_axis
+            a = major_axis/2
+            b = minor_axis/2
         else:
-            temp = b
+            temp = minor_axis
+            a = minor_axis/2
+            b = major_axis/2
         inner_pixels = display_window.image[int(y - temp):int(y + temp), int(x - temp):int(x + temp)]
-        centroid_x, centroid_y = centroid_2dg(inner_pixels)
+        mask = np.zeros(inner_pixels.shape, dtype=bool)
+        for i in range(int(y-temp), int(y + temp)):
+            for j in range(int(x-temp), int(x + temp)):
+                i_2 = i-y
+                j_2 = j-x
+                i_3 = i_2*np.cos(angle) - j_2*np.sin(angle)
+                j_3 = i_2*np.sin(angle) + j_2*np.cos(angle)
+                if (i_3/a)**2 + (j_3/b)**2 <= 1:
+                    mask[int(i-y+temp), int(j-x+temp)] = True
+        centroid_x, centroid_y = centroid_2dg(inner_pixels, mask=mask)
         if centroid_x < 0 or centroid_x >= inner_pixels.shape[1] or centroid_y < 0 or centroid_y >= inner_pixels.shape[0]:
             return x, y
         return (centroid_x + x - temp, centroid_y + y - temp)                

@@ -1,8 +1,5 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5 import NavigationToolbar2QT as NavigationToolbar
 import matplotlib as mpl
-from matplotlib import pyplot as plt
 from astropy.visualization import ImageNormalize, LinearStretch
 from vispy import app, scene
 import numpy as np
@@ -30,7 +27,8 @@ class DisplayWindow(QtWidgets.QWidget):
         self.ui.OpenHeader.clicked.connect(self.open_header)
         self.canvas.events.mouse_move.connect(self.on_mouse_move)
         self.canvas.events.mouse_wheel.connect(self.on_zoom)
-        self.canvas.events.mouse_press.connect(self.on_mouse_clicked)
+        self.canvas.events.mouse_press.connect(self.on_mouse_click)
+        self.canvas.events.mouse_double_click.connect(self.on_mouse_double_click)
         self.plot_image()
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.main_window = main_window
@@ -43,7 +41,10 @@ class DisplayWindow(QtWidgets.QWidget):
     def on_zoom(self, event):
         pass
     
-    def on_mouse_clicked(self, event):
+    def on_mouse_double_click(self, event):
+        pass
+    
+    def on_mouse_click(self, event):
         if self.main_window.aperture_window:
             if event.is_dragging:
                 pass
