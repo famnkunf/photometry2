@@ -20,12 +20,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionHistogram.triggered.connect(self.action_Histogram)
         self.ui.actionAperture.triggered.connect(self.action_Aperture)
         self.ui.actionObjects.triggered.connect(self.action_Objects)
+        # self.ui.mdiArea.setViewMode(QtWidgets.QMdiArea.TabbedView)
+        self.ui.mdiArea.setViewMode(QtWidgets.QMdiArea.SubWindowView)
+        self.ui.mdiArea.tileSubWindows()
         self.display_windows: list[DisplayWindow] = []
         self.limit = ()
         self.current_display_window = None
         self.histogram_window = None
         self.aperture_window = None
         self.objects_window = None
+        self.ui.actionObjects.trigger()
+        self.ui.actionAperture.trigger()
+        self.ui.actionHistogram.trigger()
     def action_SaveAll(self):
         print("Save All")
         
@@ -48,6 +54,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def action_Objects(self):
         if self.objects_window is None:
             self.objects_window = ObjectsWindow(self)
+            mdisubwindow = self.ui.mdiArea.addSubWindow(self.objects_window)
             self.objects_window.show()
         else:
             self.objects_window.raise_()
@@ -55,6 +62,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def action_Histogram(self):
         if self.histogram_window is None:
             self.histogram_window = HistogramWindow(self)
+            self.ui.mdiArea.addSubWindow(self.histogram_window)
             self.histogram_window.show()
         else:
             self.histogram_window.raise_()
@@ -62,6 +70,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def action_Aperture(self):
         if self.aperture_window is None:
             self.aperture_window = ApertureWindow(self)
+            self.ui.mdiArea.addSubWindow(self.aperture_window)
             self.aperture_window.show()
         else:
             self.aperture_window.raise_()

@@ -47,10 +47,18 @@ class ApertureWindow(QtWidgets.QWidget):
             transform.rotate(self.ui.angle.value(), (0, 0, 1))
             transform.translate((x, y, 0))
             self.aperture.transform = transform
-            if self.inner_aperture.parent != display_window.view.scene:
-                self.current_display_window = display_window
-                display_window.view.add(self.aperture)
-                    
+            
+    def init_aperture(self, display_window, x, y):
+        x = x if x is not None else self.current_x
+        y = y if y is not None else self.current_y
+        self.current_display_window = display_window
+        self.current_x, self.current_y = x, y
+        self.drawing = True
+        self.aperture = scene.Node(parent=display_window.view.scene)
+        self.inner_aperture = scene.Ellipse(center=(0, 0), radius=(0, 0), border_color='red', color=(0, 0, 0, 0), parent=self.aperture)
+        self.gap_aperture = scene.Ellipse(center=(0, 0), radius=(0, 0), border_color='yellow', color=(0, 0, 0, 0), parent=self.aperture)
+        self.outer_aperture = scene.Ellipse(center=(0, 0), radius=(0, 0), border_color='blue', color=(0, 0, 0, 0), parent=self.aperture)
+            
     def toggle_drawing(self, display_window, x, y):
         if self.drawing:
             centroid_x, centroid_y = self.get_centroid(display_window, x, y)

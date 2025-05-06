@@ -120,7 +120,7 @@ class ObjectsWindow(QtWidgets.QWidget):
             with open(file_name, 'w') as f:
                 f.write("ID,X,Y,Intensity,Name,Notes\n")
                 for obj in self.objects:
-                    f.write(f"{obj['id']},{obj['x']},{obj['y']},{obj['intensity']},{obj['name']},{obj['notes']}\n")
+                    f.write(f"{obj['id']},{obj['x']},{obj['y']},{obj['intensity']},{obj['name']},{obj['notes']+'-'+obj['file_name']}\n")
         
     def closeEvent(self, a0):
         return super().closeEvent(a0)

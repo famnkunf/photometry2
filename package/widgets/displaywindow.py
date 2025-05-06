@@ -42,6 +42,17 @@ class DisplayWindow(QtWidgets.QWidget):
     def on_zoom(self, event):
         pass
     
+    def enterEvent(self, a0):
+        if self.main_window.aperture_window:
+            self.main_window.aperture_window.init_aperture(self, None, None)
+        return super().enterEvent(a0)
+    
+    def leaveEvent(self, a0):
+        if self.main_window.aperture_window:
+            self.main_window.aperture_window.aperture.parent = None
+            self.canvas.update()
+        return super().leaveEvent(a0)
+    
     def on_mouse_double_click(self, event):
         if self.main_window.aperture_window:
             transform = self.image_scene.get_transform(map_to='canvas')
@@ -64,7 +75,6 @@ class DisplayWindow(QtWidgets.QWidget):
             x, y, _, _= transform.imap(event.pos)
             if self.main_window.aperture_window:
                 self.main_window.aperture_window.draw_aperture(self, x, y)
-            self.canvas.update()
     
     def plot_image(self):
         pass
