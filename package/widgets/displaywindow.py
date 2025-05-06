@@ -44,13 +44,14 @@ class DisplayWindow(QtWidgets.QWidget):
     
     def enterEvent(self, a0):
         if self.main_window.aperture_window:
-            self.main_window.aperture_window.init_aperture(self, None, None)
+            if self.main_window.aperture_window.drawing:
+                self.main_window.aperture_window.init_aperture()
         return super().enterEvent(a0)
     
     def leaveEvent(self, a0):
         if self.main_window.aperture_window:
-            self.main_window.aperture_window.aperture.parent = None
-            self.canvas.update()
+            if self.main_window.aperture_window.drawing:
+                self.main_window.aperture_window.aperture.parent = None
         return super().leaveEvent(a0)
     
     def on_mouse_double_click(self, event):

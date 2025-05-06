@@ -17,12 +17,7 @@ class ApertureWindow(QtWidgets.QWidget):
         self.ui.angle.valueChanged.connect(self.update_value)
         self.ui.gap.valueChanged.connect(self.update_value)
         self.ui.background.valueChanged.connect(self.update_value)
-        transform = scene.STTransform(translate=(0, 0, -1), scale=(1, 1, 1))
-        self.aperture = scene.Node(parent=None)
-        self.aperture.transform = transform
-        self.inner_aperture = scene.Ellipse(center=(0, 0), radius=(0, 0), border_color='red', color=(0, 0, 0, 0), parent=self.aperture)
-        self.gap_aperture = scene.Ellipse(center=(0, 0), radius=(0, 0), border_color='yellow', color=(0, 0, 0, 0), parent=self.aperture)
-        self.outer_aperture = scene.Ellipse(center=(0, 0), radius=(0, 0), border_color='blue', color=(0, 0, 0, 0), parent=self.aperture)
+        self.init_aperture()
         self.current_display_window = None
         self.current_x = None
         self.current_y = None
@@ -36,25 +31,25 @@ class ApertureWindow(QtWidgets.QWidget):
             return
         if self.drawing:
             self.current_x, self.current_y = x, y
-            self.inner_aperture.center = (x, y)
-            self.gap_aperture.center = (x, y)
-            self.outer_aperture.center = (x, y)
-            self.inner_aperture.radius = (self.ui.major_axis.value(), self.ui.minor_axis.value())
-            self.gap_aperture.radius = (self.ui.major_axis.value() + 2*self.ui.gap.value(), self.ui.minor_axis.value() + 2*self.ui.gap.value())
-            self.outer_aperture.radius = (self.ui.major_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value(), self.ui.minor_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value())
-            transform = scene.MatrixTransform()
-            transform.translate((-x, -y, -1))
-            transform.rotate(self.ui.angle.value(), (0, 0, 1))
-            transform.translate((x, y, 0))
-            self.aperture.transform = transform
+        else:
+            x, y = self.current_x, self.current_y
+        self.inner_aperture.center = (x, y)
+        self.gap_aperture.center = (x, y)
+        self.outer_aperture.center = (x, y)
+        self.inner_aperture.radius = (self.ui.major_axis.value(), self.ui.minor_axis.value())
+        self.gap_aperture.radius = (self.ui.major_axis.value() + 2*self.ui.gap.value(), self.ui.minor_axis.value() + 2*self.ui.gap.value())
+        self.outer_aperture.radius = (self.ui.major_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value(), self.ui.minor_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value())
+        transform = scene.MatrixTransform()
+        transform.translate((-x, -y, -1))
+        transform.rotate(self.ui.angle.value(), (0, 0, 1))
+        transform.translate((x, y, 0))
+        self.aperture.transform = transform
+        if self.aperture.parent is None:
+            self.aperture.parent = display_window.view.scene
             
-    def init_aperture(self, display_window, x, y):
-        x = x if x is not None else self.current_x
-        y = y if y is not None else self.current_y
-        self.current_display_window = display_window
-        self.current_x, self.current_y = x, y
+    def init_aperture(self):
         self.drawing = True
-        self.aperture = scene.Node(parent=display_window.view.scene)
+        self.aperture = scene.Node()
         self.inner_aperture = scene.Ellipse(center=(0, 0), radius=(0, 0), border_color='red', color=(0, 0, 0, 0), parent=self.aperture)
         self.gap_aperture = scene.Ellipse(center=(0, 0), radius=(0, 0), border_color='yellow', color=(0, 0, 0, 0), parent=self.aperture)
         self.outer_aperture = scene.Ellipse(center=(0, 0), radius=(0, 0), border_color='blue', color=(0, 0, 0, 0), parent=self.aperture)
