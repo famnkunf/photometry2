@@ -32,27 +32,29 @@ class ApertureWindow(QtWidgets.QWidget):
         self.draw_aperture(self.current_display_window, self.current_x, self.current_y)
             
     def draw_aperture(self, display_window, x, y):
+        if x is None or y is None:
+            return
         if self.drawing:
-            if x is not None and y is not None:
-                self.current_x, self.current_y = x, y
-                self.inner_aperture.center = (x, y)
-                self.gap_aperture.center = (x, y)
-                self.outer_aperture.center = (x, y)
-                self.inner_aperture.radius = (self.ui.major_axis.value(), self.ui.minor_axis.value())
-                self.gap_aperture.radius = (self.ui.major_axis.value() + 2*self.ui.gap.value(), self.ui.minor_axis.value() + 2*self.ui.gap.value())
-                self.outer_aperture.radius = (self.ui.major_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value(), self.ui.minor_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value())
-                transform = scene.MatrixTransform()
-                transform.translate((-x, -y, -1))
-                transform.rotate(self.ui.angle.value(), (0, 0, 1))
-                transform.translate((x, y, 0))
-                self.aperture.transform = transform
-                if self.inner_aperture.parent != display_window.view.scene:
-                    self.current_display_window = display_window
-                    display_window.view.add(self.aperture)
+            self.current_x, self.current_y = x, y
+            self.inner_aperture.center = (x, y)
+            self.gap_aperture.center = (x, y)
+            self.outer_aperture.center = (x, y)
+            self.inner_aperture.radius = (self.ui.major_axis.value(), self.ui.minor_axis.value())
+            self.gap_aperture.radius = (self.ui.major_axis.value() + 2*self.ui.gap.value(), self.ui.minor_axis.value() + 2*self.ui.gap.value())
+            self.outer_aperture.radius = (self.ui.major_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value(), self.ui.minor_axis.value() + 2 * self.ui.gap.value() + 2*self.ui.background.value())
+            transform = scene.MatrixTransform()
+            transform.translate((-x, -y, -1))
+            transform.rotate(self.ui.angle.value(), (0, 0, 1))
+            transform.translate((x, y, 0))
+            self.aperture.transform = transform
+            if self.inner_aperture.parent != display_window.view.scene:
+                self.current_display_window = display_window
+                display_window.view.add(self.aperture)
                     
     def toggle_drawing(self, display_window, x, y):
         if self.drawing:
             centroid_x, centroid_y = self.get_centroid(display_window, x, y)
+            self.current_x, self.current_y = centroid_x, centroid_y
             self.inner_aperture.center = (centroid_x, centroid_y)
             self.gap_aperture.center = (centroid_x, centroid_y)
             self.outer_aperture.center = (centroid_x, centroid_y)

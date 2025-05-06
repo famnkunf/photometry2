@@ -79,4 +79,4 @@ class HistogramWindow(QtWidgets.QWidget):
         
     def closeEvent(self, event):
         self.main_window.histogram_window = None
-        super().closeEvent()
+        super().closeEvent(event)
