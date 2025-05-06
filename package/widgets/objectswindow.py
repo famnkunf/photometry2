@@ -69,6 +69,16 @@ class ObjectsWindow(QtWidgets.QWidget):
         else:
             self.selected_object = None
             self.selected_object_marker.parent = None
+    
+    def keyPressEvent(self, a0):
+        if a0.key() == QtCore.Qt.Key_Delete:
+            if self.selected_object is not None:
+                self.selected_object['aperture'].parent = None
+                self.objects.remove(self.selected_object)
+                self.ui.objects_table.removeRow(self.ui.objects_table.selectedItems()[0].row())
+                self.selected_object = None
+                self.update_table()
+        return super().keyPressEvent(a0)
         
     def update_object(self, row, column):
         if row >= len(self.objects):
