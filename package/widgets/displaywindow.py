@@ -33,6 +33,7 @@ class DisplayWindow(QtWidgets.QWidget):
         self.plot_image()
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.main_window = main_window
+        self.header_window = None
         
     def focusInEvent(self, event: QtGui.QFocusEvent):
         if self.main_window.histogram_window:
