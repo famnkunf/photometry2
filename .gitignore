@@ -3,3 +3,10 @@
 */__pycache__
 package/*/__pycache__
 package/ui/*.ui
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/photometry2.iml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/dictionaries/project.xml
+/.idea/vcs.xml

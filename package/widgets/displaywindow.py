@@ -33,7 +33,7 @@ class DisplayWindow(QtWidgets.QWidget):
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.main_window = main_window
         self.header_window = None
-        
+
     def focusInEvent(self, event: QtGui.QFocusEvent):
         if self.main_window.histogram_window:
             self.main_window.histogram_window.set_data(self)
@@ -79,6 +79,9 @@ class DisplayWindow(QtWidgets.QWidget):
         if event.pos is not None:
             x, y, _, _= transform.imap(event.pos)
             if self.main_window.aperture_window:
+                if self.main_window.aperture_window.current_display_window != self:
+                    self.main_window.aperture_window.current_display_window = self
+                    self.main_window.aperture_window.init_aperture()
                 self.main_window.aperture_window.draw_aperture(self, x, y)
     
     def plot_image(self):
