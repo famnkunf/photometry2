@@ -1,5 +1,5 @@
-from PyQt5 import QtWidgets, QtCore, QtGui
-from vispy import scene, util
+from PyQt5 import QtWidgets, QtCore
+from vispy import scene
 import numpy as np
 
 from ..ui.objectswindow_ui import Ui_ObjectsWindow
@@ -21,7 +21,7 @@ class ObjectsWindow(QtWidgets.QWidget):
         
     def add_new_object(self, display_window, x, y, major_axis, minor_axis, angle, gap, background, intensity, snr):
         aperture = scene.Node(parent=display_window.view.scene)
-        inner_aperture = scene.Ellipse(center=(x, y), radius=(major_axis, minor_axis), border_color='yellow', color=(0, 0, 0, 0), parent=aperture)
+        scene.Ellipse(center=(x, y), radius=(major_axis, minor_axis), border_color='yellow', color=(0, 0, 0, 0), parent=aperture)
         gap_aperture = scene.Ellipse(center=(x, y), radius=(major_axis + 2*gap, minor_axis + 2*gap), border_color='yellow', color=(0, 0, 0, 0), parent=aperture)
         outer_aperture = scene.Ellipse(center=(x, y), radius=(major_axis + 2 * gap + 2*background, minor_axis + 2 * gap + 2*background), border_color='yellow', color=(0, 0, 0, 0), parent=aperture)
         gap_aperture.border._connect = "segments"
@@ -52,25 +52,27 @@ class ObjectsWindow(QtWidgets.QWidget):
         self.update_table()
     
     def update_selected_object(self):
-        if self.selected_object_marker is not None:
-            self.selected_object_marker.parent = None
-        else:
-            self.selected_object_marker = scene.Markers()
-            self.selected_object_marker.transform = scene.STTransform(translate=(0, 0, -1), scale=(1, 1, 1))     
         if len(self.ui.objects_table.selectedItems()) > 0:
+            if self.selected_object_marker is not None:
+                self.selected_object_marker.parent = None
+            self.selected_object_marker = scene.Markers()
+            self.selected_object_marker.transform = scene.STTransform(translate=(0, 0, -1), scale=(1, 1, 1))
             row = self.ui.objects_table.selectedItems()[0].row()
             if row >= len(self.objects):
                 return
-            self.selected_object = self.objects[row]
+            self.selected_object: dict = self.objects[row]
             x, y = self.selected_object['x'], self.selected_object['y']
             display_window = self.selected_object['display_window']
+            if not display_window.isVisible():
+                return
             self.selected_object_marker.parent = display_window.view.scene
             self.selected_object_marker.set_data(pos=np.array([[x, y]]), face_color='red', size=10)
             self.selected_object['display_window'].raise_()
         else:
-            self.selected_object = None
-            self.selected_object_marker.parent = None
-    
+            self.selected_object = {}
+            if self.selected_object_marker is not None:
+                self.selected_object_marker.parent = None
+
     def keyPressEvent(self, a0):
         if a0.key() == QtCore.Qt.Key_Delete:
             if self.selected_object is not None:

@@ -1,6 +1,6 @@
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets
 import numpy as np
-from vispy import scene, util
+from vispy import scene
 from photutils.centroids import centroid_2dg
 
 from ..ui import aperturewindow_ui
@@ -17,6 +17,10 @@ class ApertureWindow(QtWidgets.QWidget):
         self.ui.angle.valueChanged.connect(self.update_value)
         self.ui.gap.valueChanged.connect(self.update_value)
         self.ui.background.valueChanged.connect(self.update_value)
+        self.aperture = None
+        self.inner_aperture = None
+        self.gap_aperture = None
+        self.outer_aperture = None
         self.init_aperture()
         self.current_display_window = None
         self.current_x = None
@@ -62,8 +66,7 @@ class ApertureWindow(QtWidgets.QWidget):
             self.gap_aperture.center = (centroid_x, centroid_y)
             self.outer_aperture.center = (centroid_x, centroid_y)
         else:
-            if self.aperture.visible == False:
-                self.aperture.visible = True
+            self.aperture.visible = True if not self.aperture.visible else False
         self.drawing = not self.drawing
         
         
@@ -92,7 +95,7 @@ class ApertureWindow(QtWidgets.QWidget):
         centroid_x, centroid_y = centroid_2dg(inner_pixels, mask=mask)
         if centroid_x < 0 or centroid_x >= inner_pixels.shape[1] or centroid_y < 0 or centroid_y >= inner_pixels.shape[0]:
             return x, y
-        return (centroid_x + x - temp, centroid_y + y - temp)
+        return centroid_x + x - temp, centroid_y + y - temp
     
     def add_new_object(self, display_window, x, y):
         centroid_x, centroid_y = self.get_centroid(display_window, x, y)
@@ -130,7 +133,8 @@ class ApertureWindow(QtWidgets.QWidget):
                 snr)
             self.main_window.objects_window.show()
 
-    def get_intensity(self, displaywindow, x, y, major_axis, minor_axis, angle, gap, background):
+    @staticmethod
+    def get_intensity(display_window, x, y, major_axis, minor_axis, angle, gap, background):
         if major_axis >= minor_axis:
             temp = major_axis
             a = major_axis/2
@@ -139,9 +143,9 @@ class ApertureWindow(QtWidgets.QWidget):
             temp = minor_axis
             a = minor_axis/2
             b = major_axis/2
-        inner_mask = np.zeros(displaywindow.image.shape, dtype=bool)
-        background_mask = np.zeros(displaywindow.image.shape, dtype=bool)
-        gap_mask = np.zeros(displaywindow.image.shape, dtype=bool)
+        inner_mask = np.zeros(display_window.image.shape, dtype=bool)
+        background_mask = np.zeros(display_window.image.shape, dtype=bool)
+        gap_mask = np.zeros(display_window.image.shape, dtype=bool)
         for i in range(int(y - temp - gap - background), int(y + temp + gap + background)):
             for j in range(int(x - temp - gap - background), int(x + temp + gap + background)):
                 i_2 = i-y
@@ -154,12 +158,12 @@ class ApertureWindow(QtWidgets.QWidget):
                     background_mask[int(i), int(j)] = True
                 if (i_3/(a + gap))**2 + (j_3/(b + gap))**2 <= 1:
                     gap_mask[int(i), int(j)] = True
-        inner_pixels = displaywindow.image[inner_mask]
-        background_pixels = displaywindow.image[background_mask & ~gap_mask]
+        inner_pixels = display_window.image[inner_mask]
+        background_pixels = display_window.image[background_mask & ~gap_mask]
         intensity = np.sum(inner_pixels - np.mean(background_pixels))
         snr = intensity / (np.std(background_pixels)*np.sqrt(len(inner_pixels)))
         return intensity, snr
-                               
+
     def closeEvent(self, event):
         self.main_window.aperture_window = None
         self.aperture.visible = False

@@ -30,6 +30,7 @@ class Ui_GraphWindow(object):
         self.comboBox.addItem("")
         self.comboBox.addItem("")
         self.comboBox.addItem("")
+        self.comboBox.addItem("")
         self.horizontalLayout.addWidget(self.comboBox)
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem1)
@@ -41,6 +42,7 @@ class Ui_GraphWindow(object):
     def retranslateUi(self, GraphWindow):
         _translate = QtCore.QCoreApplication.translate
         GraphWindow.setWindowTitle(_translate("GraphWindow", "Graph Window"))
-        self.comboBox.setItemText(0, _translate("GraphWindow", "Line"))
-        self.comboBox.setItemText(1, _translate("GraphWindow", "Horizontal Box"))
-        self.comboBox.setItemText(2, _translate("GraphWindow", "Area"))
+        self.comboBox.setItemText(0, _translate("GraphWindow", "None"))
+        self.comboBox.setItemText(1, _translate("GraphWindow", "Line"))
+        self.comboBox.setItemText(2, _translate("GraphWindow", "Horizontal Box"))
+        self.comboBox.setItemText(3, _translate("GraphWindow", "Area"))

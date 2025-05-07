@@ -1,6 +1,5 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore
 from astropy.io import fits
-import numpy as np
 
 from .ui import mainwindow_ui
 from .widgets.displaywindow import DisplayWindow
@@ -17,13 +16,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("Photometry v2.0")
         self.setMinimumSize(600, 500)
         self.resize(600, 500)
-        self.ui.action_Open.triggered.connect(self.action_Open)
-        self.ui.actionCloseAll.triggered.connect(self.action_CloseAll)
-        self.ui.actionHistogram.triggered.connect(self.action_Histogram)
-        self.ui.actionAperture.triggered.connect(self.action_Aperture)
-        self.ui.actionObjects.triggered.connect(self.action_Objects)
-        self.ui.actionGraph.triggered.connect(self.action_Graph)
-        self.ui.actionTiled.triggered.connect(self.action_Tiled)
+        self.ui.action_Open.triggered.connect(self.action_open)
+        self.ui.actionCloseAll.triggered.connect(self.action_close_all)
+        self.ui.actionHistogram.triggered.connect(self.action_histogram)
+        self.ui.actionAperture.triggered.connect(self.action_aperture)
+        self.ui.actionObjects.triggered.connect(self.action_objects)
+        self.ui.actionGraph.triggered.connect(self.action_graph)
+        self.ui.actionTiled.triggered.connect(self.action_tiled)
         # self.ui.mdiArea.setViewMode(QtWidgets.QMdiArea.TabbedView)
         self.ui.mdiArea.setViewMode(QtWidgets.QMdiArea.SubWindowView)
         self.ui.mdiArea.tileSubWindows()
@@ -39,20 +38,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionHistogram.trigger()
         self.ui.actionGraph.trigger()
         
-    def action_CloseAll(self):
+    def action_close_all(self):
         for display_window in self.display_windows:
             display_window.close()
         self.display_windows.clear()
         
-    def action_Open(self):
+    def action_open(self):
         file_names, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Open FITS file", "", "FITS files (*.fits *.fit);;All files (*)")
         if file_names:
             for file_name in file_names:
                 try:
-                    with fits.open(file_name) as hdul:
-                        image_data = hdul[0].data
+                    with fits.open(file_name) as f:
+                        image_data = f[0].data
                         if image_data is not None:
-                            display_window = DisplayWindow(image_data, file_name, header_data=hdul[0].header, main_window=self)
+                            display_window = DisplayWindow(image_data, file_name, header_data=f[0].header, main_window=self)
                             display_window.show()
                             self.display_windows.append(display_window)
                         else:
@@ -60,7 +59,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 except Exception as e:
                     print(f"Error opening FITS file: {e}")
                     
-    def action_Graph(self):
+    def action_graph(self):
         if self.graph_window is None:
             self.graph_window = GraphWindow(self)
             self.ui.mdiArea.addSubWindow(self.graph_window)
@@ -68,7 +67,7 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.graph_window.raise_()
                     
-    def action_Objects(self):
+    def action_objects(self):
         if self.objects_window is None:
             self.objects_window = ObjectsWindow(self)
             self.ui.mdiArea.addSubWindow(self.objects_window)
@@ -76,7 +75,7 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.objects_window.raise_()
                     
-    def action_Histogram(self):
+    def action_histogram(self):
         if self.histogram_window is None:
             self.histogram_window = HistogramWindow(self)
             self.ui.mdiArea.addSubWindow(self.histogram_window)
@@ -84,7 +83,7 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.histogram_window.raise_()
 
-    def action_Aperture(self):
+    def action_aperture(self):
         if self.aperture_window is None:
             self.aperture_window = ApertureWindow(self)
             self.ui.mdiArea.addSubWindow(self.aperture_window)
@@ -92,7 +91,7 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.aperture_window.raise_()
                 
-    def action_Tiled(self):
+    def action_tiled(self):
         if self.ui.mdiArea.subWindowList():
             self.ui.mdiArea.tileSubWindows()
                 

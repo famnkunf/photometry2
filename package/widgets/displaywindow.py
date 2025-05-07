@@ -1,8 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import matplotlib as mpl
-from astropy.visualization import ImageNormalize, LinearStretch
-from vispy import app, scene
-import numpy as np
+from vispy import scene
+from vispy.geometry import Rect
 
 from ..ui import displaywindow_ui
 from .headerwindow import HeaderWindow
@@ -63,13 +62,17 @@ class DisplayWindow(QtWidgets.QWidget):
             self.main_window.aperture_window.aperture.visible = False
     
     def on_mouse_click(self, event):
-        if self.main_window.aperture_window:
-            if event.is_dragging:
+        if self.main_window.graph_window:
+            if self.main_window.graph_window.drawing:
                 pass
             else:
-                transform = self.image_scene.get_transform(map_to='canvas')
-                x, y, _, _= transform.imap(event.pos)
-                self.main_window.aperture_window.toggle_drawing(self, x, y)
+                if self.main_window.aperture_window:
+                    if event.is_dragging:
+                        pass
+                    else:
+                        transform = self.image_scene.get_transform(map_to='canvas')
+                        x, y, _, _= transform.imap(event.pos)
+                        self.main_window.aperture_window.toggle_drawing(self, x, y)
             
     def on_mouse_move(self, event):
         transform = self.image_scene.get_transform(map_to='canvas')
