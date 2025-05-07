@@ -126,6 +126,7 @@ class ObjectsWindow(QtWidgets.QWidget):
                     f.write(f"{obj['id']},{obj['x']},{obj['y']},{obj['intensity']},{obj['snr']},{obj['name']},{obj['notes']+'-'+obj['file_name']}\n")
         
     def closeEvent(self, a0):
+        self.main_window.objects_window = None
         return super().closeEvent(a0)
 
         
