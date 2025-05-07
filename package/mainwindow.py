@@ -7,6 +7,7 @@ from .widgets.displaywindow import DisplayWindow
 from .widgets.histogramwindow import HistogramWindow
 from .widgets.aperturewindow import ApertureWindow
 from .widgets.objectswindow import ObjectsWindow
+from .widgets.graphwindow import GraphWindow
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -21,6 +22,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionHistogram.triggered.connect(self.action_Histogram)
         self.ui.actionAperture.triggered.connect(self.action_Aperture)
         self.ui.actionObjects.triggered.connect(self.action_Objects)
+        self.ui.actionGraph.triggered.connect(self.action_Graph)
+        self.ui.actionTiled.triggered.connect(self.action_Tiled)
         # self.ui.mdiArea.setViewMode(QtWidgets.QMdiArea.TabbedView)
         self.ui.mdiArea.setViewMode(QtWidgets.QMdiArea.SubWindowView)
         self.ui.mdiArea.tileSubWindows()
@@ -30,9 +33,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.histogram_window = None
         self.aperture_window = None
         self.objects_window = None
+        self.graph_window = None
         self.ui.actionObjects.trigger()
         self.ui.actionAperture.trigger()
         self.ui.actionHistogram.trigger()
+        self.ui.actionGraph.trigger()
+        
     def action_CloseAll(self):
         for display_window in self.display_windows:
             display_window.close()
@@ -53,6 +59,14 @@ class MainWindow(QtWidgets.QMainWindow):
                             print("No image data found in the FITS file.")
                 except Exception as e:
                     print(f"Error opening FITS file: {e}")
+                    
+    def action_Graph(self):
+        if self.graph_window is None:
+            self.graph_window = GraphWindow(self)
+            self.ui.mdiArea.addSubWindow(self.graph_window)
+            self.graph_window.show()
+        else:
+            self.graph_window.raise_()
                     
     def action_Objects(self):
         if self.objects_window is None:
@@ -78,6 +92,10 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.aperture_window.raise_()
                 
+    def action_Tiled(self):
+        if self.ui.mdiArea.subWindowList():
+            self.ui.mdiArea.tileSubWindows()
+                
     def closeEvent(self, event):
         question_box = QtWidgets.QMessageBox(self)
         question_box.setWindowFlags(question_box.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
@@ -96,6 +114,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.aperture_window.close()
             if self.objects_window:
                 self.objects_window.close()
+            if self.graph_window:
+                self.graph_window.close()
             super().closeEvent(event)
         else:
             event.ignore()

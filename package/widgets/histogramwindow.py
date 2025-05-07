@@ -6,7 +6,7 @@ from ..ui import histogramwindow_ui
 
 class HistogramWindow(QtWidgets.QWidget):
     def __init__(self, main_window):
-        # super().__init__(None, QtCore.Qt.WindowStaysOnTopHint)
+        super().__init__()
         self.ui = histogramwindow_ui.Ui_Histogram()
         self.ui.setupUi(self)
         self.histogram_data = None

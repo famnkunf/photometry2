@@ -8,7 +8,7 @@ from .objectswindow import ObjectsWindow
 
 class ApertureWindow(QtWidgets.QWidget):
     def __init__(self, main_window):
-        # super().__init__(None, QtCore.Qt.WindowStaysOnTopHint)
+        super().__init__()
         self.ui = aperturewindow_ui.Ui_ApertureWindow()
         self.ui.setupUi(self)
         self.main_window = main_window
