@@ -13,10 +13,11 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.ui = mainwindow_ui.Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowIcon(QtGui.QIcon("../assets/splash.ico"))
         self.setWindowTitle("Photometry v2.0")
+        self.setMinimumSize(600, 500)
+        self.resize(600, 500)
         self.ui.action_Open.triggered.connect(self.action_Open)
-        self.ui.actionSave_All.triggered.connect(self.action_SaveAll)
+        self.ui.actionCloseAll.triggered.connect(self.action_CloseAll)
         self.ui.actionHistogram.triggered.connect(self.action_Histogram)
         self.ui.actionAperture.triggered.connect(self.action_Aperture)
         self.ui.actionObjects.triggered.connect(self.action_Objects)
@@ -32,8 +33,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionObjects.trigger()
         self.ui.actionAperture.trigger()
         self.ui.actionHistogram.trigger()
-    def action_SaveAll(self):
-        print("Save All")
+    def action_CloseAll(self):
+        for display_window in self.display_windows:
+            display_window.close()
+        self.display_windows.clear()
         
     def action_Open(self):
         file_names, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Open FITS file", "", "FITS files (*.fits *.fit);;All files (*)")
@@ -54,7 +57,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def action_Objects(self):
         if self.objects_window is None:
             self.objects_window = ObjectsWindow(self)
-            mdisubwindow = self.ui.mdiArea.addSubWindow(self.objects_window)
+            self.ui.mdiArea.addSubWindow(self.objects_window)
             self.objects_window.show()
         else:
             self.objects_window.raise_()

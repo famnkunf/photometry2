@@ -44,7 +44,7 @@ class ApertureWindow(QtWidgets.QWidget):
         transform.rotate(self.ui.angle.value(), (0, 0, 1))
         transform.translate((x, y, 0))
         self.aperture.transform = transform
-        if self.aperture.parent is None:
+        if self.aperture.parent is None and display_window is not None:
             self.aperture.parent = display_window.view.scene
             
     def init_aperture(self):
@@ -98,7 +98,7 @@ class ApertureWindow(QtWidgets.QWidget):
         centroid_x, centroid_y = self.get_centroid(display_window, x, y)
         major_axis = self.ui.major_axis.value()
         minor_axis = self.ui.minor_axis.value()
-        angle = np.deg2rad(self.ui.angle.value())
+        angle = self.ui.angle.value()
         gap = self.ui.gap.value()
         background = self.ui.background.value()
         intensity, snr = self.get_intensity(display_window, centroid_x, centroid_y, major_axis, minor_axis, angle, gap, background)
