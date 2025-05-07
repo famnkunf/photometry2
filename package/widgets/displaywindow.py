@@ -21,7 +21,7 @@ class DisplayWindow(QtWidgets.QWidget):
         self.canvas = scene.SceneCanvas(keys='interactive')
         self.view = self.canvas.central_widget.add_view(bgcolor='gray')
         self.image_scene = scene.Image(self.image,cmap='gray', parent=self.view.scene)
-        self.view.camera = scene.PanZoomCamera(rect=(0, 0, self.image.shape[1], self.image.shape[0]), aspect=1)
+        self.view.camera = scene.PanZoomCamera(rect=Rect(0, 0, self.image.shape[1], self.image.shape[0]), aspect=1)
         self.image_scene.clim = (self.image.mean() - 0. * self.image.std(), self.image.mean() + 0.5 * self.image.std())
         self.ui.verticalLayout_2.addWidget(self.canvas.native)
         self.ui.OpenHeader.clicked.connect(self.open_header)
