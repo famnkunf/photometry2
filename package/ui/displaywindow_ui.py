@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\display_window.ui'
+# Form implementation generated from reading ui file '.\displaywindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -50,6 +50,10 @@ class Ui_DisplayWindow(object):
         self.pushButton = QtWidgets.QPushButton(DisplayWindow)
         self.pushButton.setObjectName("pushButton")
         self.horizontalLayout.addWidget(self.pushButton)
+        self.progressBar = QtWidgets.QProgressBar(DisplayWindow)
+        self.progressBar.setProperty("value", 24)
+        self.progressBar.setObjectName("progressBar")
+        self.horizontalLayout.addWidget(self.progressBar)
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem2)
         self.verticalLayout.addLayout(self.horizontalLayout)

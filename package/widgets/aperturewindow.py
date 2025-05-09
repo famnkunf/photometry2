@@ -66,7 +66,7 @@ class ApertureWindow(QtWidgets.QWidget):
             self.gap_aperture.center = (centroid_x, centroid_y)
             self.outer_aperture.center = (centroid_x, centroid_y)
         else:
-            self.aperture.visible = True if not self.aperture.visible else False
+            self.aperture.visible = True
         self.drawing = not self.drawing
         
         
@@ -84,12 +84,14 @@ class ApertureWindow(QtWidgets.QWidget):
             b = major_axis/2
         inner_pixels = display_window.image[int(y - temp):int(y + temp), int(x - temp):int(x + temp)]
         mask = np.zeros(inner_pixels.shape, dtype=bool)
+        angle_c = np.cos(angle)
+        angle_s = np.sin(angle)
         for i in range(int(y-temp), int(y + temp)):
             for j in range(int(x-temp), int(x + temp)):
                 i_2 = i-y
                 j_2 = j-x
-                i_3 = i_2*np.cos(angle) - j_2*np.sin(angle)
-                j_3 = i_2*np.sin(angle) + j_2*np.cos(angle)
+                i_3 = i_2*angle_c - j_2*angle_s
+                j_3 = i_2*angle_s + j_2*angle_c
                 if (i_3/a)**2 + (j_3/b)**2 <= 1:
                     mask[int(i-y+temp), int(j-x+temp)] = True
         centroid_x, centroid_y = centroid_2dg(inner_pixels, mask=mask)
@@ -146,6 +148,9 @@ class ApertureWindow(QtWidgets.QWidget):
         inner_mask = np.zeros(display_window.image.shape, dtype=bool)
         background_mask = np.zeros(display_window.image.shape, dtype=bool)
         gap_mask = np.zeros(display_window.image.shape, dtype=bool)
+        display_window.ui.progressBar.setValue(0)
+        total_pixels = (temp+gap+background)**2
+        count = 0
         for i in range(int(y - temp - gap - background), int(y + temp + gap + background)):
             for j in range(int(x - temp - gap - background), int(x + temp + gap + background)):
                 i_2 = i-y
@@ -158,6 +163,9 @@ class ApertureWindow(QtWidgets.QWidget):
                     background_mask[int(i), int(j)] = True
                 if (i_3/(a + gap))**2 + (j_3/(b + gap))**2 <= 1:
                     gap_mask[int(i), int(j)] = True
+                count += 1
+            display_window.ui.progressBar.setValue(int(count/total_pixels*100))
+            display_window.canvas.update()
         inner_pixels = display_window.image[inner_mask]
         background_pixels = display_window.image[background_mask & ~gap_mask]
         intensity = np.sum(inner_pixels - np.mean(background_pixels))

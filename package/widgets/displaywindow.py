@@ -12,6 +12,7 @@ class DisplayWindow(QtWidgets.QWidget):
         super().__init__()
         self.ui = displaywindow_ui.Ui_DisplayWindow()
         self.ui.setupUi(self)
+        self.ui.progressBar.setVisible(False)
         self.image = image
         self.title = title
         self.header_data = header_data
@@ -58,8 +59,10 @@ class DisplayWindow(QtWidgets.QWidget):
         if self.main_window.aperture_window:
             transform = self.image_scene.get_transform(map_to='canvas')
             x, y, _, _= transform.imap(event.pos)
+            self.ui.progressBar.setVisible(True)
             self.main_window.aperture_window.add_new_object(self, x, y)
             self.main_window.aperture_window.aperture.visible = False
+            self.ui.progressBar.setVisible(False)
     
     def on_mouse_click(self, event):
         if self.main_window.graph_window:
