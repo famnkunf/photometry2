@@ -1,0 +1,7 @@
+astropy==6.1.7
+matplotlib==3.7.1
+photutils==2.0.2
+PyQt5==5.15.11
+PyQt5_sip==12.17.0
+vispy==0.15.0
+numpy==1.26.4
